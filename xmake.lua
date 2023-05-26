@@ -1,4 +1,16 @@
-target("switch-support-files")
+add_rules("mode.debug", "mode.release")
+
+set_allowedplats("switch")
+set_allowedarchs("switch|aarch64")
+
+target("crtn")
     set_kind("static")
 
-    add_files("src/*.S")
+    add_files("src/crtn.S")
+
+target("crti")
+    set_kind("static")
+
+    add_files("src/crtn.S")
+
+    add_deps("crti")

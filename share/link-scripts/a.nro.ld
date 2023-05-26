@@ -64,7 +64,7 @@ SECTIONS
 	.gcc_except_table : ONLY_IF_RO { *(.gcc_except_table .gcc_except_table.*) } :rodata
 	.gnu_extab        : ONLY_IF_RO { *(.gnu_extab*) } : rodata
 
-	.dynamic           : { *(.dynamic) } :rodata :dyn
+	.dynamic           : { PROVIDE (_DYNAMIC = .); *(.dynamic) } :rodata :dyn
 	.dynsym            : { *(.dynsym) } :rodata
 	.dynstr            : { *(.dynstr) } :rodata
 	.rela.dyn          : { *(.rela.*) } :rodata

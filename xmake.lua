@@ -13,4 +13,4 @@ target("crti")
 
     add_files("src/crti.S")
 
-    add_deps("crti")
+    add_deps("crtn")

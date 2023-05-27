@@ -8,7 +8,7 @@ option("objectdir")
     set_showmenu(true)
 option_end()
 
-target("switch-link-scripts")
+target("switch-support-files")
     set_kind("object")
 
     add_files("src/*.S")

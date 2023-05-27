@@ -3,12 +3,16 @@ add_rules("mode.debug", "mode.release")
 set_allowedplats("switch")
 set_allowedarchs("switch|aarch64")
 
-target("crtn")
+option("objectdir")
+    set_default("lib")
+    set_showmenu(true)
+option_end()
+
+target("switch-link-scripts")
     set_kind("object")
 
-    add_files("src/crtn.S")
+    add_files("src/*.S")
 
-target("crti")
-    set_kind("object")
+    add_options("objectdir")
 
-    add_files("src/crti.S")
+    set_objectdir("$(objectdir)")

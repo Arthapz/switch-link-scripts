@@ -4,13 +4,11 @@ set_allowedplats("switch")
 set_allowedarchs("switch|aarch64")
 
 target("crtn")
-    set_kind("static")
+    set_kind("object")
 
     add_files("src/crtn.S")
 
 target("crti")
-    set_kind("static")
+    set_kind("object")
 
     add_files("src/crti.S")
-
-    add_deps("crtn")

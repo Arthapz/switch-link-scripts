@@ -8,7 +8,6 @@ PHDRS {
 	data     PT_LOAD FLAGS(6) /* Read | Write */;
 	tls      PT_TLS FLAGS(4);
 	dyn      PT_DYNAMIC FLAGS(6);
-	property 0x6474e553 FLAGS(4);
 	eh_frame PT_GNU_EH_FRAME;
 }
 
@@ -86,7 +85,6 @@ SECTIONS {
 	.gnu.version_d     : { *(.gnu.version_d) } :rodata
 	.gnu.version_r     : { *(.gnu.version_r) } :rodata
 	.note.gnu.build-id : { *(.note.gnu.build-id) } :rodata
-	.note.gnu.property : { *(.note.gnu.property) . = ALIGN(8); } :rodata :property
 
 	. = ALIGN(0x1000);
 
@@ -104,11 +102,11 @@ SECTIONS {
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		. = ALIGN(8);
 		__tdata_lma_end = .;
-	} :data
+	} :data :tls
 
 	.tbss ALIGN(8) :{
 		*(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon)
-	} :tls :data
+	} :tls
 
 	.preinit_array ALIGN(8) :{
 		PROVIDE (__preinit_array_start = .);
@@ -163,6 +161,8 @@ SECTIONS {
 	__argdata__ = ABSOLUTE(.);
 
 	/* Stabs debugging sections. */
+	/DISCARD/ : { *(.group .comment .note) }
+
 	.stab          0 :{ *(.stab) }
 	.stabstr       0 :{ *(.stabstr) }
 	.stab.excl     0 :{ *(.stab.excl) }

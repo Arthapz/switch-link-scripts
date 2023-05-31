@@ -42,7 +42,6 @@ SECTIONS {
 		. = ALIGN(8);
 	} :code
 
-	__code_end = .;
 	. = ALIGN(0x1000);
 
     /* rodata */
@@ -57,70 +56,76 @@ SECTIONS {
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
 	} :rodata
 	.eh_frame_hdr     :{
-		PROVIDE(__eh_frame_hdr_start = .);
+		__eh_frame_hdr_start = .;
 		*(.eh_frame_hdr)
 		*(.eh_frame_entry .eh_frame_entry.*)
-		PROVIDE(__eh_frame_hdr_end = .);
+		__eh_frame_hdr_end = .;
 	} :rodata :eh_frame
-	.eh_frame         : ONLY_IF_RO {
-		PROVIDE(__eh_frame_start = .);
-		KEEP (*(.eh_frame))
-		*(.eh_frame.*)
-		PROVIDE (__eh_frame_end = .); } :rodata
+	.eh_frame         : ONLY_IF_RO { KEEP (*(.eh_frame)) *(.eh_frame.*) } :rodata
 	.gcc_except_table : ONLY_IF_RO { *(.gcc_except_table .gcc_except_table.*) } :rodata
 	.gnu_extab        : ONLY_IF_RO { *(.gnu_extab*) } :rodata
 	.exception_ranges : ONLY_IF_RO { *(.exception_ranges .exception_ranges*) } :rodata
 
-	.note.gnu.property : { *(.note.gnu.property) . = ALIGN(8); } :rodata :property
-	.note.gnu.build-id : { *(.note.gnu.build-id) } :rodata :rodata
-	.hash              : { *(.hash) } :rodata
-	.gnu.hash          : { *(.gnu.hash) } :rodata
+	.dynamic :{
+		_DYNAMIC = .;
+		*(.dynamic);
+	} :rodata :dyn
 	.dynsym            : { *(.dynsym) } :rodata
 	.dynstr            : { *(.dynstr) } :rodata
-	.gnu.version       : { *(.gnu.version) } :rodata
-	.gnu.version_d     : { *(.gnu.version_d) } :rodata
-	.gnu.version_r     : { *(.gnu.version_r) } :rodata
-
-	__rodata_end = .;
-	. = ALIGN(0x1000);
-
-	.eh_frame         : ONLY_IF_RW {
-		PROVIDE(__eh_frame_start = .);
-		KEEP (*(.eh_frame))
-		*(.eh_frame.*)
-		PROVIDE (__eh_frame_end = .); } :data
-	.gcc_except_table : ONLY_IF_RW { *(.gcc_except_table .gcc_except_table.*) } :data
-	.gnu_extab        : ONLY_IF_RW { *(.gnu_extab*) } :data
-	.exception_ranges : ONLY_IF_RW { *(.exception_ranges .exception_ranges*) } :data
-
-	/* data */
-	.preinit_array :{
-		PROVIDE (__preinit_array_start = .);
-		KEEP (*(.preinit_array))
-		PROVIDE (__preinit_array_end = .);
-	} :data
-	.init_array :{
-		PROVIDE(__init_array_start = .);
-		KEEP(*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
-		KEEP(*(.init_array .ctors) )
-		PROVIDE(__init_array_end = .);
-	} :data
-	.fini_array :{
-		PROVIDE(__fini_array_start = .);
-		KEEP(*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
-		KEEP(*(.fini_array .dtors))
-		PROVIDE(__fini_array_end = .);
-	} :data
-	.dynamic :{
-		PROVIDE(_DYNAMIC = .);
-		*(.dynamic);
-	} :dyn :data
-	.rela.dyn          : { *(.rela.*) } :data
+	.rela.dyn : { *(.rela.*) } :rodata
 	.rela.plt : {
 		*(.rela.plt)
 		PROVIDE_HIDDEN(__rela_iplt_start = .);
 		*(.rela.iplt)
 		PROVIDE_HIDDEN(__rela_iplt_end = .);
+	} :rodata
+	.interp            : { *(.interp) } :rodata
+	.hash              : { *(.hash) } :rodata
+	.gnu.hash          : { *(.gnu.hash) } :rodata
+	.gnu.version       : { *(.gnu.version) } :rodata
+	.gnu.version_d     : { *(.gnu.version_d) } :rodata
+	.gnu.version_r     : { *(.gnu.version_r) } :rodata
+	.note.gnu.build-id : { *(.note.gnu.build-id) } :rodata
+	.note.gnu.property : { *(.note.gnu.property) . = ALIGN(8); } :rodata :property
+
+	. = ALIGN(0x1000);
+
+	/* data */
+	__data_start = .;
+
+	.eh_frame         : ONLY_IF_RW { KEEP (*(.eh_frame)) *(.eh_frame.*) } :data
+	.gcc_except_table : ONLY_IF_RW { *(.gcc_except_table .gcc_except_table.*) } :data
+	.gnu_extab        : ONLY_IF_RW { *(.gnu_extab*) } :data
+	.exception_ranges : ONLY_IF_RW { *(.exception_ranges .exception_ranges*) } :data
+
+      /* tls */
+	.tdata ALIGN(8) :{
+		__tdata_lma = .;
+		*(.tdata .tdata.* .gnu.linkonce.td.*)
+		. = ALIGN(8);
+		__tdata_lma_end = .;
+	} :data
+
+	.tbss ALIGN(8) :{
+		*(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon)
+	} :tls :data
+
+	.preinit_array ALIGN(8) :{
+		PROVIDE (__preinit_array_start = .);
+		KEEP (*(.preinit_array))
+		PROVIDE (__preinit_array_end = .);
+	} :data
+	.init_array ALIGN(8) :{
+		PROVIDE(__init_array_start = .);
+		KEEP(*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
+		KEEP(*(.init_array .ctors) )
+		PROVIDE(__init_array_end = .);
+	} :data
+	.fini_array ALIGN(8) :{
+		PROVIDE(__fini_array_start = .);
+		KEEP(*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
+		KEEP(*(.fini_array .dtors))
+		PROVIDE(__fini_array_end = .);
 	} :data
 
 	__got_start__ = .;
@@ -130,45 +135,26 @@ SECTIONS {
 
 	__got_end__ = .;
 
-	.data :{
-		PROVIDE(__data_start = .);
+	.data ALIGN(8) :{
 		*(.data .data.* .gnu.linkonce.d.*)
 		SORT(CONSTRUCTORS)
-		. = ALIGN(8);
 	} :data
 
 	__bss_start__ = .;
-
-	.bss :{
+	.bss ALIGN(8) :{
 		*(.dynbss)
 		*(.bss .bss.* .gnu.linkonce.b.*)
 		*(COMMON)
 		. = ALIGN(8);
 
 		/* Reserve space for the TLS segment of the main thread */
-		PROVIDE(__tls_start = .);
+		__tls_start = .;
 		. += SIZEOF(.tdata) + SIZEOF(.tbss);
-		PROVIDE(__tls_end = .);
+		__tls_end = .;
 	} :data
-
 	__bss_end__ = .;
 
-	__data_end = .;
 	. = ALIGN(0x1000);
-
-    /* tls */
-	__tdata_lma = .;
-
-	.tdata :{
-		*(.tdata .tdata.* .gnu.linkonce.td.*)
-		. = ALIGN(8);
-	} :tls
-
-	.tbss :{
-		*(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon)
-	} :tls
-
-	__tdata_lma_end = .;
 
 	__end__ = ABSOLUTE(.);
 
